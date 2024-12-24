@@ -14,12 +14,12 @@ variable "common_tags" {
   }
 }
 
-variable "rds_tags" {
-  default = {
-    Component = "mysql"
-  }
-}
-
 variable "zone_name" {
   default = "harshadaws81s.online"
+}
+
+variable "app_alb_tags" {
+  default = {
+    Component = "app-alb"
+  }
 }

@@ -159,17 +159,26 @@ module "app_alb_sg" {
   source       = "git::https://github.com/Harshadaws-81/terraform-aws-security-group.git?ref=main"
   project_name = var.project_name
   environment  = var.environment
-  sg_name      = "app_alb"  # expense-dev-app-alb
+  sg_name      = "app_alb" # expense-dev-app-alb
   vpc_id       = local.vpc_id
   common_tags  = var.common_tags
   sg_tags      = var.app_alb_sg_tags
 }
 
-resource "aws_security_group_rule" "backend_app_alb" {   # backend is accepting connections from app_alb
-  type              = "ingress"
-  from_port         = 8080
-  to_port           = 8080
-  protocol          = "tcp"
+resource "aws_security_group_rule" "backend_app_alb" { # backend is accepting connections from app_alb
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
   source_security_group_id = module.app_alb_sg.id
-  security_group_id = module.backend_sg.id   # target
+  security_group_id        = module.backend_sg.id # target
+}
+
+resource "aws_security_group_rule" "app_alb_bastion" { # app_alb is accepting connections from bastion
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  source_security_group_id = module.bastion_sg.id
+  security_group_id        = module.app_alb_sg.id # target
 }

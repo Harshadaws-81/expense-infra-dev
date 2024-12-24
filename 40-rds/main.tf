@@ -1,7 +1,7 @@
 module "db" {
   source = "terraform-aws-modules/rds/aws"
 
-  identifier = local.resource_name   # expense-dev
+  identifier = local.resource_name # expense-dev
 
   engine            = "mysql"
   engine_version    = "8.0"
@@ -61,4 +61,25 @@ module "db" {
       ]
     },
   ]
+}
+
+# creating Route53 record
+module "records" {
+  source = "terraform-aws-modules/route53/aws//modules/records"
+
+  zone_name = var.zone_name
+
+  records = [
+
+    {
+      name = "mysql-${var.environment}"
+      type = "CNAME"
+      ttl  = 1
+      records = [
+        module.db.db_instance_address
+      ]
+      allow_overwrite = true
+    }
+  ]
+
 }
