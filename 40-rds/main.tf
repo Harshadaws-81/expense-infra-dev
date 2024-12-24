@@ -1,7 +1,7 @@
 module "db" {
   source = "terraform-aws-modules/rds/aws"
 
-  identifier = local.resource_name # expense-dev
+  identifier = local.resource_name   # expense-dev
 
   engine            = "mysql"
   engine_version    = "8.0"
@@ -11,7 +11,7 @@ module "db" {
   db_name                     = "transactions"
   username                    = "root"
   manage_master_user_password = false
-  password                    = "ExpenseApp1 "
+  password                    = "ExpenseApp1"
   port                        = "3306"
 
 
