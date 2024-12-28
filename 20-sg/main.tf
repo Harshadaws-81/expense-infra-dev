@@ -182,3 +182,76 @@ resource "aws_security_group_rule" "app_alb_bastion" { # app_alb is accepting co
   source_security_group_id = module.bastion_sg.id
   security_group_id        = module.app_alb_sg.id # target
 }
+
+# VPN Security_Group
+module "vpn_sg" {
+  source       = "git::https://github.com/Harshadaws-81/terraform-aws-security-group.git?ref=main"
+  project_name = var.project_name
+  environment  = var.environment
+  sg_name      = "vpn"
+  vpc_id       = local.vpc_id
+  common_tags  = var.common_tags
+}
+# Accepting connections from ports - 22 , 943 , 443 , 1194
+resource "aws_security_group_rule" "vpn_public_22" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = module.vpn_sg.id
+}
+
+resource "aws_security_group_rule" "vpn_public_443" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = module.vpn_sg.id
+}
+
+resource "aws_security_group_rule" "vpn_public_943" {
+  type              = "ingress"
+  from_port         = 943
+  to_port           = 943
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = module.vpn_sg.id
+}
+
+resource "aws_security_group_rule" "vpn_public_1194" {
+  type              = "ingress"
+  from_port         = 1194
+  to_port           = 1194
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = module.vpn_sg.id
+}
+
+resource "aws_security_group_rule" "app_alb_vpn" { # app_alb is accepting connections from vpn
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  source_security_group_id = module.vpn_sg.id
+  security_group_id        = module.app_alb_sg.id # target
+}
+
+resource "aws_security_group_rule" "backend_vpn" { # Backend is accepting connections from vpn
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  source_security_group_id = module.vpn_sg.id
+  security_group_id        = module.backend_sg.id # target
+}
+
+resource "aws_security_group_rule" "backend_vpn_8080" { # Backend is accepting connections from vpn_8080
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  source_security_group_id = module.vpn_sg.id
+  security_group_id        = module.backend_sg.id # target
+}
