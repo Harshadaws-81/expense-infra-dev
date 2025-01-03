@@ -9,6 +9,7 @@ module "app_alb" {
   subnets               = local.private_subnet_ids
   security_groups       = [data.aws_ssm_parameter.app_alb_sg_id.value]
   create_security_group = false
+  enable_deletion_protection = false
 
   tags = merge(
     var.common_tags,
