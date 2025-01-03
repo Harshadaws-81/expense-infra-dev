@@ -18,23 +18,32 @@ module "backend" {
   )
 }
 
-# resource "null_resource" "backend" {
-#   # Changes to any instance of the cluster requires re-provisioning
-#   triggers = {
-#     instance_id = 
-#   }
+resource "null_resource" "backend" {
+  # Changes to any instance of the cluster requires re-provisioning
+  triggers = {
+    instance_id = module.backend.id
+  }
 
-#   # Bootstrap script can run on any instance of the cluster
-#   # So we just choose the first in this case
-#   connection {
-#     host = element(aws_instance.cluster[*].public_ip, 0)
-#   }
+  # Bootstrap script can run on any instance of the cluster
+  # So we just choose the first in this case
+  connection {
+    host     = module.backend.private_ip
+    type     = "ssh"
+    user     = "ec2-user"
+    password = "DevOps321"
+  }
 
-#   provisioner "remote-exec" {
-#     # Bootstrap script called with private_ip of each node in the cluster
-#     inline = [
-#       "bootstrap-cluster.sh ${join(" ",
-#       aws_instance.cluster[*].private_ip)}",
-#     ]
-#   }
-# }
+  provisioner "file" {
+    source      = "${var.backend_tags.Component}.sh"
+    destination = "/tmp/backend.sh"
+  }
+
+  provisioner "remote-exec" {
+    # Bootstrap script called with private_ip of each node in the cluster
+    inline = [
+      "chmod +x /tmp/backend.sh",
+      "sudo sh /tmp/backend.sh ${var.backend_tags.Component} ${var.environment}"
+    ]
+  }
+
+}
