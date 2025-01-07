@@ -255,3 +255,32 @@ resource "aws_security_group_rule" "backend_vpn_8080" { # Backend is accepting c
   source_security_group_id = module.vpn_sg.id
   security_group_id        = module.backend_sg.id # target
 }
+
+# WEB-ALB
+module "web_alb_sg" {
+  source       = "git::https://github.com/Harshadaws-81/terraform-aws-security-group.git?ref=main"
+  project_name = var.project_name
+  environment  = var.environment
+  sg_name      = "web-alb"
+  vpc_id       = local.vpc_id
+  common_tags  = var.common_tags
+  sg_tags      = var.web_alb_sg_tags
+}
+
+resource "aws_security_group_rule" "web_alb_http" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = module.web_alb_sg.id
+}
+
+resource "aws_security_group_rule" "web_alb_https" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = module.web_alb_sg.id
+}
