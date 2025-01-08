@@ -256,12 +256,12 @@ resource "aws_security_group_rule" "backend_vpn_8080" { # Backend is accepting c
   security_group_id        = module.backend_sg.id # target
 }
 
-# WEB-ALB
+# # WEB-ALB
 module "web_alb_sg" {
   source       = "git::https://github.com/Harshadaws-81/terraform-aws-security-group.git?ref=main"
   project_name = var.project_name
   environment  = var.environment
-  sg_name      = "web-alb"
+  sg_name      = "web-alb" #expense-dev-web-alb
   vpc_id       = local.vpc_id
   common_tags  = var.common_tags
   sg_tags      = var.web_alb_sg_tags
