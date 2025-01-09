@@ -23,7 +23,3 @@ variable "frontend_tags" {
 variable "zone_name" {
   default = "harshadaws81s.online"
 }
-
-variable "zone_id" {
-  default = "Z10285273HTISRK9KKTQT"
-}

@@ -1,4 +1,4 @@
-# ec2 instance creation (Frontend)
+# ec2 instance creation (frontend)
 
 module "frontend" {
   source = "terraform-aws-modules/ec2-instance/aws"
@@ -8,6 +8,7 @@ module "frontend" {
   instance_type          = "t3.micro"
   vpc_security_group_ids = [local.frontend_sg_id]
   subnet_id              = local.public_subnet_id
+
   tags = merge(
     var.common_tags,
     var.frontend_tags,
@@ -83,7 +84,7 @@ resource "aws_lb_target_group" "frontend" {
     unhealthy_threshold = 2
     interval            = 5
     matcher             = "200-299"
-    path                = "/health"
+    path                = "/"
     port                = 80
     protocol            = "HTTP"
     timeout             = 4
