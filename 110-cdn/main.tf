@@ -1,17 +1,17 @@
 resource "aws_cloudfront_distribution" "expense" {
   origin {
-    domain_name              = "${var.project_name}-${var.environment}.${var.zone_name}"
-    origin_id                = "${var.project_name}-${var.environment}.${var.zone_name}"
+    domain_name = "${var.project_name}-${var.environment}.${var.zone_name}"
+    origin_id   = "${var.project_name}-${var.environment}.${var.zone_name}"
 
     custom_origin_config {
-        http_port = 80
-        https_port = 443
-        origin_protocol_policy = "https-only"
-        origin_ssl_protocols = ["TLSv1.2"]
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
 
-  enabled             = true
+  enabled = true
 
   aliases = ["${var.project_name}-cdn.${var.zone_name}"]
 
@@ -25,7 +25,7 @@ resource "aws_cloudfront_distribution" "expense" {
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400
-    cache_policy_id = data.aws_cloudfront_cache_policy.noCache.id
+    cache_policy_id        = data.aws_cloudfront_cache_policy.noCache.id
   }
 
   # Cache behavior with precedence 0
@@ -40,7 +40,7 @@ resource "aws_cloudfront_distribution" "expense" {
     max_ttl                = 31536000
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
-    cache_policy_id = data.aws_cloudfront_cache_policy.cacheOptmised.id
+    cache_policy_id        = data.aws_cloudfront_cache_policy.cacheOptmised.id
   }
 
   # Cache behavior with precedence 1
@@ -55,7 +55,7 @@ resource "aws_cloudfront_distribution" "expense" {
     max_ttl                = 31536000
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
-    cache_policy_id = data.aws_cloudfront_cache_policy.cacheOptmised.id
+    cache_policy_id        = data.aws_cloudfront_cache_policy.cacheOptmised.id
   }
 
   restrictions {
@@ -68,26 +68,26 @@ resource "aws_cloudfront_distribution" "expense" {
   tags = merge(
     var.common_tags,
     {
-        Name = local.resource_name
+      Name = local.resource_name
     }
   )
 
   viewer_certificate {
-    acm_certificate_arn = local.https_certificate_arn
-    ssl_support_method = "sni-only"
+    acm_certificate_arn      = local.https_certificate_arn
+    ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
 }
 
 module "records" {
-  source  = "terraform-aws-modules/route53/aws//modules/records"
+  source = "terraform-aws-modules/route53/aws//modules/records"
 
   zone_name = var.zone_name #harshadaws81s.online
   records = [
     {
-      name    = "expense-cdn" # *.app-dev
-      type    = "A"
-      alias   = {
+      name = "expense-cdn" # *.app-dev
+      type = "A"
+      alias = {
         name    = aws_cloudfront_distribution.expense.domain_name
         zone_id = aws_cloudfront_distribution.expense.hosted_zone_id # This belongs CDN internal hosted zone, not ours
       }
